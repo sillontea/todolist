@@ -29,7 +29,7 @@ function App() {
     fetch("/api/todos", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ task: newTask })
+      body: JSON.stringify({ task: newTask, date: date.toISOString().slice(0,10) })
     })
       .then(res => res.json())
       .then(data => {
@@ -86,7 +86,7 @@ function App() {
           style={{ marginLeft: "16px", marginRight: "10px" }}
         />
         <button onClick={addTodo} style={{ marginBottom: "10px" }}>추가</button>
-        
+
         <ul style={{ listStyle: "none", paddingLeft: "8px" }}>
           {todos.map(todo => (
             <li key={todo.id} style={{ marginBottom: "8px" }}>

@@ -44,13 +44,18 @@ class Todo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     task = db.Column(db.String(200), nullable=False)
     completed = db.Column(db.Boolean, default=False, nullable=False)
+    date = db.Column(db.String(10), nullable=False)  # "YYYY-MM-DD" 형식
 
     def to_dict(self):
-        return {"id": self.id, "task": self.task, "completed": self.completed}
+        return {"id": self.id, "task": self.task, "completed": self.completed, "date": self.date}
 
 @app.route("/api/todos", methods=["GET"])
 def get_todos():
-    todos = Todo.query.all()
+    date = request.args.get("date")
+    if date:
+        todos = Todo.query.filter_by(date=date).all()
+    else:
+        todos = Todo.query.all()
     return jsonify([t.to_dict() for t in todos])
 
 @app.route("/api/todos", methods=["POST"])
@@ -58,7 +63,8 @@ def add_todo():
     data = request.get_json()
     new_todo = Todo(
         task=data["task"],
-        completed=data.get("completed", False)
+        completed=data.get("completed", False),
+        date=data["date"]  # 클라이언트에서 날짜 정보 받아옴
     )
     db.session.add(new_todo)
     db.session.commit()
