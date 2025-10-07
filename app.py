@@ -32,10 +32,6 @@ CORS(app)
 #     todos = [t for t in todos if t["id"] != todo_id]
 #     return jsonify({"message": "Todo deleted!"}), 200
 
-
-# SQLITE3
-app = Flask(__name__)
-
 import os
 # app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///todos.db"
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -47,9 +43,10 @@ db = SQLAlchemy(app)
 class Todo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     task = db.Column(db.String(200), nullable=False)
+    completed = db.Column(db.Boolean, default=False, nullable=False)
 
     def to_dict(self):
-        return {"id": self.id, "task": self.task}
+        return {"id": self.id, "task": self.task, "completed": self.completed}
 
 @app.route("/api/todos", methods=["GET"])
 def get_todos():
@@ -59,17 +56,31 @@ def get_todos():
 @app.route("/api/todos", methods=["POST"])
 def add_todo():
     data = request.get_json()
-    new_todo = Todo(task=data["task"])
+    new_todo = Todo(
+        task=data["task"],
+        completed=data.get("completed", False)
+    )
     db.session.add(new_todo)
     db.session.commit()
     return jsonify(new_todo.to_dict())
 
 @app.route("/api/todos/<int:todo_id>", methods=["DELETE"])
 def delete_todo(todo_id):
+
     todo = Todo.query.get_or_404(todo_id)
     db.session.delete(todo)
     db.session.commit()
     return "", 204
+
+
+@app.route("/api/todos/<int:todo_id>", methods=["PATCH"])
+def update_todo(todo_id):
+    todo = Todo.query.get_or_404(todo_id)
+    data = request.get_json()
+    if "completed" in data:
+        todo.completed = data["completed"]
+    db.session.commit()
+    return jsonify(todo.to_dict())
 
 
 if __name__ == "__main__":

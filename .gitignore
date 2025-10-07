@@ -1,3 +1,12 @@
 # SQLite database file
 *.db
 *.sqlite3
+
+# Python 캐시 무시
+__pycache__/
+*.pyc
+
+# Node.js 관련 무시 (React 쪽)
+node_modules/
+build/
+
