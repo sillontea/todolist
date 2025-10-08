@@ -9,3 +9,18 @@
 This project is a simple Todo List web app that lets you manage tasks by date and view real-time completion progress.
 You can add, delete, check tasks as completed, move between dates, and see the progress bar.
 
+<b>Tech Stack</b>
+  
+Frontend
+React (JavaScript) — UI 구현
+Node.js 런타임 + npm — 패키지 설치 및 개발 서버 실행
+
+Backend
+Python Flask — REST API 서버
+SQLite — 로컬 데이터베이스 (Python 드라이버: pysqlite3)
+Poetry — 파이썬 의존성/가상환경 관리
+
+Development Tools
+VS Code — IDE
+npm scripts (npm run dev, npm run build)
+Poetry (poetry install, poetry run)
