@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 function App() {
+  const [progress, setProgress] = useState(0); // 진행률 0~100
   const [todos, setTodos] = useState([]);
   const [newTask, setNewTask] = useState("");
   const [date, setDate] = useState(new Date());
@@ -23,6 +24,14 @@ function App() {
       .then(res => res.json())
       .then(data => setTodos(data));
   }, [date]);
+
+    // 할일 진행률 변경 시 해당 날짜의 진행률 불러오기
+  useEffect(() => {
+    fetch(`/api/todos/progress?date=${date.toISOString().slice(0,10)}`)
+      .then(res => res.json())
+      .then(data => setProgress(data.progress));
+  }, [date]);
+
 
    // 할 일 추가
   const addTodo = () => {
@@ -47,6 +56,13 @@ function App() {
     });
   };
 
+  // 진행률 업데이트 함수
+  const updateProgress = () => {
+    fetch(`/api/todos/progress?date=${date.toISOString().slice(0,10)}`)
+    .then(res => res.json())
+    .then(data => setProgress(data.progress));
+  };
+
   // 완료 상태 토글
   const toggleCompleted = (id, completed) => {
     fetch(`/api/todos/${id}`, {
@@ -57,11 +73,29 @@ function App() {
       .then(res => res.json())
       .then(updated => {
         setTodos(todos.map(todo => todo.id === id ? updated : todo));
+        updateProgress(); // 진행률 업데이트
       });
   };
 
   return (
     <>
+      {/* 진행률 표시 영역 */}
+      <div style={{
+        position: "absolute",
+        top: 24,
+        right: 24,
+        fontSize: "2rem",
+        fontWeight: "bold",
+        color: progress === 100 ? "green" : "black",
+        background: "#f5f5f5",
+        padding: "12px 24px",
+        borderRadius: "12px",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+        zIndex: 1000
+      }}>
+        {progress}%
+      </div>
+
       {/* 입력창 + 추가 버튼 */}
       <div style={{ marginBottom: "10px", display: "flex", alignItems: "center" }}>
         <button onClick={() => changeDate(-1)} style={{ fontSize: "24px", background: "none", border: "none", cursor: "pointer" }}>&#9664;</button>

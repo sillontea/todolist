@@ -58,6 +58,16 @@ def get_todos():
         todos = Todo.query.all()
     return jsonify([t.to_dict() for t in todos])
 
+
+@app.route("/api/todos/progress", methods=["GET"])
+def progress_todo():
+    date = request.args.get("date")
+    todos_n = Todo.query.filter_by(date=date).count() if date else 0
+    completed_n = Todo.query.filter_by(date=date, completed=True).count() if date else 0
+    progress = round(completed_n / todos_n * 100, 1) if todos_n > 0 else 0
+    return jsonify({"progress": progress})
+
+
 @app.route("/api/todos", methods=["POST"])
 def add_todo():
     data = request.get_json()
